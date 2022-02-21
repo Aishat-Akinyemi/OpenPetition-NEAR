@@ -1,5 +1,5 @@
 import { context, storage, PersistentMap, logging, u128 } from "near-sdk-as";
-import { Petition, petitions } from "./models";
+import { Petition, petitions, signature } from "./models";
 import { asNEAR } from "./utils";
 
 
@@ -11,10 +11,10 @@ export function createPetition(petition: Petition): void {
 export function sign(petitionId: i32): bool {
   const petition = petitions[petitionId- 1];
   if(petition.isFunded){  
-    return petition.signWithFunds(context.attachedDeposit);
+    return petition.signWithFunds(petitionId-1, context.attachedDeposit);
   }
   else {
-    return petition.sign();
+    return petition.sign(petitionId-1);
   } 
 }
 
@@ -31,18 +31,8 @@ export function show(petitionId: i32): Petition {
   return petitions[petitionId - 1];  
 }
 
-export function getFund(petitionId: i32): string {
-  const petition = petitions[petitionId- 1];
-  if(petition.isFunded){    
-    return asNEAR(petition.funding);
-  }
-  else {
-    return "NOT A FUNDED PETIOTION";
-  } 
-}
-
-export function listSignatories(petitionId: i32): Array<string> {  
-  const signatures = petitions[petitionId -1].signature;
+export function listSignatories(): Array<string> {  
+  const signatures = signature;
   const signatureLenght = signatures.length;
   const signatureList = new Array<string>(signatureLenght-1);
   for (let index = 0; index < signatureLenght; index++) {
@@ -50,6 +40,18 @@ export function listSignatories(petitionId: i32): Array<string> {
   }
   return signatureList;
 }
+
+export function disburseFunds(petitionId: i32, amount: u128, accountId: string): string {  
+  const collector = accountId;
+  const isTransferSuccessful = petitions[petitionId-1].disburseFunds(petitionId, amount, collector);
+  if(isTransferSuccessful){
+    return `successfully transferred ${amount} to ${accountId}`
+  }
+  return 'failed to transfer';
+}
+
+
+
 
 
 

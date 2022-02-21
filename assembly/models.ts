@@ -37,11 +37,6 @@ export class Petition {
         this.funding.update(amount);
         return true;
     } 
-    
-
-    
-    
-
 }
 
 @nearBindgen

@@ -41,14 +41,6 @@ export function listSignatories(): Array<string> {
   return signatureList;
 }
 
-export function disburseFunds(petitionId: i32, amount: u128, accountId: string): string {  
-  const collector = accountId;
-  const isTransferSuccessful = petitions[petitionId-1].disburseFunds(petitionId, amount, collector);
-  if(isTransferSuccessful){
-    return `successfully transferred ${amount} to ${accountId}`
-  }
-  return 'failed to transfer';
-}
 
 
 

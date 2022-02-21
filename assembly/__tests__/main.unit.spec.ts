@@ -121,14 +121,5 @@ describe("show details of a Petition", () => {
  });
 });
 
- describe("it should change funding value", () => {
-  it("show details of a Petition", () => {
-   createPetition(fundedPetition);   
-   expect(petitions[0].isFunded).toBe(!fundedPetition.isFunded);  
-   clearPetitions();
-  }); 
-});
-
-
 });
 

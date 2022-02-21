@@ -1,6 +1,6 @@
 import { context, u128, VM, VMContext } from 'near-sdk-as';
 import { createPetition, sign, list, show } from '../index';
-import { Petition, petitions } from "../models";
+import { Petition, petitions, signature } from "../models";
 import { toYocto, asNEAR } from '../utils';
 
 const fundedPetition = new Petition('funded respect human rights', `it is everyone's responsibility to respect humans right.`, true, toYocto(10));
@@ -43,8 +43,8 @@ describe('openPetition', () => {
   it("should sign an unfunded Petition", ()=> {           
     createPetition(unFundedPetition);    
     expect(sign(1)).toBeTruthy("should sign successfully");      
-    expect(petitions[0].signature.length).toBe(1);
-    log(petitions[0].signature.first);
+    expect(signature.length).toBe(1);
+    log(signature.first);
     clearPetitions();
   });    
 });
@@ -73,15 +73,12 @@ describe("Create a funded Petition ", () => {
 
   it("should sign a funded Petition with enough attached funds", ()=> {      
     createPetition(fundedPetition);  
-    expect(petitions[0].signature.length).toBe(0); 
+    expect(signature.length).toBe(0); 
     VMContext.setPredecessor_account_id('cc');
     attachDeposit(10);
-    log(petitions[0].funding);
     log(petitions.length);
     sign(petitions.length);
-    expect(petitions[0].signature.length).toBe(1);
-    expect(petitions[0].funding).toBe(toYocto(10)); 
-    log(petitions[0].funding);
+    expect(signature.length).toBe(1); 
     clearPetitions(); 
   });
 
@@ -122,8 +119,16 @@ describe("show details of a Petition", () => {
   expect(show(1).body).toBe(fundedPetition.body);  
   clearPetitions();
  });
- 
 });
+
+ describe("it should change funding value", () => {
+  it("show details of a Petition", () => {
+   createPetition(fundedPetition);   
+   expect(petitions[0].isFunded).toBe(!fundedPetition.isFunded);  
+   clearPetitions();
+  }); 
+});
+
 
 });
 

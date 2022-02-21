@@ -38,21 +38,9 @@ export class Petition {
         return true;
     } 
     
-    disburseFunds(petitionId: i32, amount:u128, collector:string): bool {
-        assert(this.creator == context.predecessor, "only the creator of this petition can disburse funds");
-        //assert(this.funding.receivedFunds> u128.Zero, "This petition has no undisbursed funds.")
-        //assert(this.funding.receivedFunds >= amount, "amount transferred must be smaller than or equal to funding");
-        const promise = ContractPromiseBatch.create(collector).transfer(amount);
-       promise.then(Context.contractName).function_call("recordFundTransfer", new OnTransferArgs(petitionId, amount, collector), u128.Zero, XCC_GAS);
-        // this.recordFundTransfer(amount, collector);
-        return true;
-    }
+
     
-    // recordFundTransfer(amount: u128, receiver:string): void {
-    //     assert_self();
-    //     //assert_single_promise_success();
-    //     this.funding.record_transfer(amount, receiver); 
-    // }
+    
 
 }
 

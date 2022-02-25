@@ -2,6 +2,10 @@
 
 #### This smartcontract written in AssemblyScript on NEAR platform is an Open Petition smart contract. 
 
+### Purpose
+
+Users can create, sign and fund petitions.
+
 #### The call methods are: 
 - **createPetition** : this method adds petition to the storage
 - **signPetition** : this method adds a signature to a petition

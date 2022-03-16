@@ -1,4 +1,5 @@
-import { Context, ContractPromise, u128 } from 'near-sdk-as';
+import { base58, Context, ContractPromise, env, u128 } from 'near-sdk-as';
+import { Fruit } from './basket-contract/assembly/models';
 
 /**
  * == CONSTANTS ================================================================
@@ -13,7 +14,10 @@ import { Context, ContractPromise, u128 } from 'near-sdk-as';
 export const ONE_NEAR = u128.from('1000000000000000000000000');
 export const XCC_GAS = 5000000000000;
 export const MIN_ACCOUNT_BALANCE = u128.mul(ONE_NEAR, u128.from(3));
-
+/// Fee divisor, allowing to provide fee in bps.
+export const FEE_DIVISOR: u32 = 10_000;
+/// Initial shares supply .
+export const INIT_SHARES_SUPPLY: u128 = u128.from(1000000000000000000000000);
 /**
  * == TYPES ====================================================================
  */
@@ -69,4 +73,66 @@ export function assert_single_promise_success(): void {
   assert(x.length == 1, "Expected exactly one promise result")
   assert(x[0].succeeded, "Expected PromiseStatus to be successful")
 }
+
+// decode a string representing a Key in the form ed25519:xxxxxxxxxxxxxx into a Uint8Array
+export function decodePk(key: string): Uint8Array {
+  if (key.indexOf(':') > -1) {
+    const keyParts = key.split(':')
+    let prefix = keyParts[0]
+    if (prefix == 'ed25519') {
+      // prefix key with base58 0 -- yes, it's actually a decimal 1 :P
+      return base58.decode('1' + keyParts[1])
+    } else {
+      assert(false, "Bad key")
+      return new Uint8Array(0)
+    }
+  } else {
+    let decodedKey = base58.decode(key)
+    if (isValidKey(key, decodedKey)) {
+      return base58.decode('1' + key)
+    } else {
+      assert(false, "Invalid key: " + key)
+      return new Uint8Array(0)
+    }
+  }
+}
+
+export function isValidKey(key: string, decodedKey: Uint8Array): boolean {
+  // key cannot be blank
+  if (key == '') {
+    return false
+  }
+  // base58 encoded key must be 43-44 characters long (or 51 with prefix 'ed25519:')
+  if (![43, 44, 51].includes(key.length)) {
+    return false
+  }
+  // remove prefix if found
+  key = key.indexOf(':') > -1 ? key.split(':')[1] : key
+  // check decoded byte length
+  if (![32, 33].includes(decodedKey.byteLength)) {
+    return false
+  }
+  return true
+}
+
+export function assertValidId(id: string): void {
+  assert(env.isValidAccountID(id), "INVALID ACCOUNT ID");
+}
+
+export function isPositive(num: u128): boolean {
+  return u128.gt(num, u128.Zero) == 1;
+}
+
+
+export function is_valid_percentage(array:Fruit[]):boolean{
+  const initialValue = 0;
+  const sumWithInitial = array.reduce(
+  (previousValue, currentValue) => previousValue + currentValue.percentage,
+  initialValue
+  );
+
+  return (sumWithInitial==100 ? true: false );
+
+}
+
 

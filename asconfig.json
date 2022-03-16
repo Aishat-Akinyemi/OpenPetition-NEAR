@@ -1,3 +1,7 @@
 {
+  "workspaces": [
+    "assembly/basket-contract",
+    "assembly/deft-factory-contract"
+  ],
     "extends": "near-sdk-as/asconfig.json"
   }
